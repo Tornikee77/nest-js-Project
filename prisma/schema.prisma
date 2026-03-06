@@ -1,0 +1,140 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String  @id @default(uuid())
+  email        String  @unique
+  password     String
+  firstName    String?
+  lastName     String?
+  role         Role    @default(USER)
+  refreshToken String?
+
+  // Relations
+  orders    Order[]
+  carts     Cart[]
+  payments  Payment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([email])
+  @@map("users")
+}
+
+model Product {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  price       Decimal @db.Decimal(10, 2)
+  stock       Int     @default(0)
+  sku         String  @unique
+  imageUrl    String?
+  isActive    Boolean @default(true)
+
+  // relations
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+  orders     Order[]
+  carts      Cart[]
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sku])
+  @@index([categoryId])
+  @@index([isActive])
+  @@map("products")
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@map("categories")
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product? @relation(fields: [productId], references: [id])
+  order     Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String?
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product? @relation(fields: [productId], references: [id])
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  user        User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String?
+  orderNumber String      @unique @default(uuid())
+  status      OrderStatus
+  totalAmount Decimal     @db.Decimal(10, 2)
+
+  product         Product?    @relation(fields: [productId], references: [id])
+  productId       String?
+  cartId          String?
+  cart            Cart?       @relation(fields: [cartId], references: [id])
+  shippingAddress String?
+  orderItems      OrderItem[]
+  payment         Payment?
+  paymentId       String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Cart {
+  id     String  @id @default(uuid())
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String?
+
+  product   Product? @relation(fields: [productId], references: [id])
+  productId String?
+  orders    Order[]
+}
+
+model Payment {
+  id      String  @id @default(uuid())
+  user    User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  String?
+  orderId String? @unique
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
