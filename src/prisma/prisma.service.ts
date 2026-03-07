@@ -29,4 +29,14 @@ export class PrismaService
     await this.$disconnect();
     console.log('database disconected!');
   }
+
+  async cleanDatabase() {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Cannot clean database in production environment!');
+    }
+
+    const models = Reflect.ownKeys(this).filter(
+      (key) => typeof key === 'string' && !key.startsWith('_'),
+    );
+  }
 }
