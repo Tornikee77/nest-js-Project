@@ -1,6 +1,6 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../generated/prisma';
 
 @Injectable()
 export class PrismaService
@@ -37,6 +37,14 @@ export class PrismaService
 
     const models = Reflect.ownKeys(this).filter(
       (key) => typeof key === 'string' && !key.startsWith('_'),
+    );
+
+    return Promise.all(
+      models.map((modelKey) => {
+        if (typeof modelKey === 'string') {
+          return this[modelKey].deleteMany();
+        }
+      }),
     );
   }
 }
