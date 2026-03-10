@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { AuthResponseDto } from './dto/authResponse.dto';
@@ -46,11 +50,11 @@ export class AuthService {
       });
 
       const tokens = await this.generateTokens(user.id, user.email);
-      await this.updateRefreshToken(user.id, tokens.refresh_token);
+      await this.updateRefreshToken(user.id, tokens.refreshToken);
 
       return {
-        accessToken: tokens.access_token,
-        refreshToken: tokens.refresh_token,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
         user: user,
       };
     } catch (error) {
@@ -63,16 +67,16 @@ export class AuthService {
   private async generateTokens(
     userId: string,
     email: string,
-  ): Promise<{ access_token: string; refresh_token: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const payload = { sub: userId, email };
     const refreshId = randomBytes(16).toString('hex');
 
-    const [access_token, refresh_token] = await Promise.all([
+    const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, { expiresIn: '15m' }),
       this.jwtService.signAsync({ ...payload, refreshId }, { expiresIn: '7d' }),
     ]);
 
-    return { access_token, refresh_token };
+    return { accessToken, refreshToken };
   }
 
   async updateRefreshToken(
@@ -83,5 +87,30 @@ export class AuthService {
       where: { id: userId },
       data: { refreshToken },
     });
+  }
+  async refreshTokens(userId: string): Promise<AuthResponseDto> {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    const tokens = await this.generateTokens(user.id, user.email);
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+
+    return {
+      ...tokens,
+      user,
+    };
   }
 }
