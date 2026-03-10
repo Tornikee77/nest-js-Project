@@ -21,7 +21,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any) {
     const { sub: userId, email } = payload;
-    // You can add additional validation logic here, like checking if user exists
     return { userId, email };
   }
 }

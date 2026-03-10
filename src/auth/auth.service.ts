@@ -58,17 +58,16 @@ export class AuthService {
   ): Promise<{ access_token: string; refresh_token: string }> {
     const payload = { sub: userId, email };
     const refreshId = randomBytes(16).toString('hex');
-    const [access_token, refresh_token] = await Promise.all([
+    const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, { expiresIn: '1h' }),
       this.jwtService.signAsync({ ...payload, refreshId }, { expiresIn: '7d' }),
     ]);
-    await this.prismaService.refreshToken.create({
-      data: {
-        token: refresh_token,
-        userId,
-      },
-    });
-    return { access_token, refresh_token };
-   
+    // await this.prismaService.refreshToken.create({
+    //   data: {
+    //     token: refresh_token,
+    //     userId,
+    //   },
+    // });
+    // return { access_token, refresh_token };
   }
 }
