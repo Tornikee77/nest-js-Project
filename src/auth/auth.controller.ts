@@ -74,7 +74,7 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JwT-auth')
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Logout',
     description: 'Logout the current user',
