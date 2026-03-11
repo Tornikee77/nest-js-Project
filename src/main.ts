@@ -20,7 +20,7 @@ async function bootstrap() {
 
   app.enableCors({
     origin: process.env.CORS_ORIGIN?.split(',') || 'http://localhost:3000',
-    Credentials: true,
+    credentials: true,
     method: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
@@ -53,7 +53,7 @@ async function bootstrap() {
       },
       'JWT-refresh',
     )
-    .addServer('http://localhost:3000/api/v1', 'Development server')
+    .addServer('http://localhost:3000', 'Development server')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

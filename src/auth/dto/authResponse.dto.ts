@@ -3,23 +3,26 @@ import { Role } from 'generated/prisma';
 
 export class AuthResponseDto {
   @ApiProperty({
-    description: 'The access token for authentication',
-    example:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+    description: 'The access token',
+    example: 'eyJhbGciOiJIUzI1Ni...',
   })
   accessToken: string;
 
   @ApiProperty({
-    description: 'The refresh token for authentication',
+    description: 'The refresh token',
+    example: 'eyJhbGciOiJIUzI1Ni...',
+  })
+  refreshToken: string;
+
+  @ApiProperty({
     example: {
-      id: '1234567890',
-      email: '<Email>',
+      id: 'uuid-123',
+      email: 'user@example.com',
       firstName: 'John',
       lastName: 'Doe',
       role: 'USER',
     },
   })
-  refreshToken: string;
   user: {
     id: string;
     email: string;

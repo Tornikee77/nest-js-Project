@@ -5,7 +5,7 @@ import {
   IsOptional,
   IsString,
   Matches,
-  Min,
+  MinLength,
 } from 'class-validator';
 
 export class RegisterDto {
@@ -23,7 +23,7 @@ export class RegisterDto {
   })
   @IsString({ message: 'Password must be a string' })
   @IsNotEmpty({ message: 'Password is required' })
-  @Min(8, { message: 'Password must be at least 8 characters long' })
+  @MinLength(8, { message: 'Password must be at least 8 characters long' })
   @Matches(
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
     {
