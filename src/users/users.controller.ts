@@ -15,4 +15,12 @@ export class UsersController {
   @ApiOperation({
     summary: 'Get current user',
   })
+  @ApiResponse({
+    status:200,
+    description: 'Current user retrieved successfully',
+    type: UserResponseDto,
+  })
+  @ApiResponse({
+    status:401, description:"Unauthorized"
+  })
 }
