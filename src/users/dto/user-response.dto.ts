@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Role } from 'generated/prisma';
+import { Role } from '@prisma/client';
 
 export class UserResponseDto {
   @ApiProperty({
@@ -14,15 +14,17 @@ export class UserResponseDto {
   email: string;
   @ApiProperty({
     description: 'User firstname',
+    nullable: true,
     example: 'John',
   })
-  firstName: string;
+  firstName: string | null;
 
   @ApiProperty({
     description: 'User last name',
     example: 'Doe',
+    nullable: true,
   })
-  lastName: string;
+  lastName: string | null;
 
   @ApiProperty({
     description: 'user role',
